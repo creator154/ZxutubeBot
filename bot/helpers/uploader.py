@@ -7,7 +7,6 @@ from typing import Optional, Tuple
 from ..youtube import GoogleAuth, YouTube
 from ..config import Config
 
-
 log = logging.getLogger(__name__)
 
 
@@ -50,31 +49,36 @@ class Uploader:
             if not os.path.isfile(Config.CRED_FILE):
                 log.debug(f"{Config.CRED_FILE} does not exist")
                 self.status = False
-                self.message = "Upload failed because you did not authenticate me."
+                self.message = "❌ Upload failed: Bot is not authenticated."
                 return
 
             auth.LoadCredentialsFile(Config.CRED_FILE)
             google = await loop.run_in_executor(None, auth.authorize)
+
+            # Category
             if Config.VIDEO_CATEGORY and Config.VIDEO_CATEGORY in self.video_category:
                 categoryId = Config.VIDEO_CATEGORY
             else:
                 categoryId = random.choice(list(self.video_category))
 
             categoryName = self.video_category[categoryId]
+
+            # Title
             title = self.title if self.title else os.path.basename(self.file)
             title = (
                 (Config.VIDEO_TITLE_PREFIX + title + Config.VIDEO_TITLE_SUFFIX)
                 .replace("<", "")
                 .replace(">", "")[:100]
             )
+
+            # Description
             description = (
                 Config.VIDEO_DESCRIPTION
-                + "\nUploaded to YouTube with https://tx.me/youtubeitbot"
+                + "\nUploaded via Telegram Bot"
             )[:5000]
-            if not Config.UPLOAD_MODE:
-                privacyStatus = "private"
-            else:
-                privacyStatus = Config.UPLOAD_MODE
+
+            # Privacy
+            privacyStatus = Config.UPLOAD_MODE if Config.UPLOAD_MODE else "private"
 
             properties = dict(
                 title=title,
@@ -83,22 +87,34 @@ class Uploader:
                 privacyStatus=privacyStatus,
             )
 
-            log.debug(f"payload for {self.file} : {properties}")
+            log.debug(f"Uploading {self.file} with {properties}")
 
             youtube = YouTube(google)
-            r = await loop.run_in_executor(
+
+            response = await loop.run_in_executor(
                 None, youtube.upload_video, self.file, properties
             )
 
-            log.debug(r)
+            log.debug(response)
 
-            video_id = r["id"]
-            self.status = True
-            self.message = (
-                f"[{title}](https://youtu.be/{video_id}) uploaded to YouTube under category "
-                f"{categoryId} ({categoryName})"
-            )
+            # ✅ LINK FIX
+            video_id = response.get("id")
+
+            if video_id:
+                url = f"https://www.youtube.com/watch?v={video_id}"
+                self.status = True
+                self.message = (
+                    f"✅ Uploaded Successfully!\n\n"
+                    f"🎬 Title: {title}\n"
+                    f"📂 Category: {categoryName}\n"
+                    f"🔒 Privacy: {privacyStatus}\n"
+                    f"🔗 Link: {url}"
+                )
+            else:
+                self.status = False
+                self.message = "❌ Upload hua but video ID nahi mila"
+
         except Exception as e:
             log.error(e, exc_info=True)
             self.status = False
-            self.message = f"Error occuered during upload.\nError details: {e}"
+            self.message = f"❌ Upload failed!\nError: {e}"
