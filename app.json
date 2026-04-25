@@ -2,77 +2,77 @@
   "name": "Youtube Upload Bot",
   "description": "Telegram to YouTube Uploader Bot",
   "repository": "https://github.com/odysseusmax/utube",
-  "logo": "https://github.com/odysseusmax/utube/blob/master/ss/logo.jpeg",
+  "logo": "https://github.com/odysseusmax/utube/raw/master/ss/logo.jpeg",
   "keywords": ["telegram", "youtube", "uploader"],
   "env": {
-      "BOT_TOKEN": {
-      "description": "Your Bot token. Get from https://t.me/botfather",
-      "value": ""
+    "BOT_TOKEN": {
+      "description": "Get from https://t.me/BotFather",
+      "required": true
     },
     "SESSION_NAME": {
-      "description": "Your Bot's username.",
+      "description": "Your Bot username",
       "value": "youtubeitbot",
-      "required":false
+      "required": false
     },
     "API_ID": {
-      "description": "Your API_ID.  Refer project docs.",
-      "value": ""
+      "description": "Telegram API ID",
+      "required": true
     },
     "API_HASH": {
-      "description": "Your API_ID. Refer project docs.",
-      "value": ""
+      "description": "Telegram API HASH",
+      "required": true
     },
     "CLIENT_ID": {
-      "description": "Your Google CLIENT_ID. Refer project docs.",
-      "value": ""
+      "description": "Google Client ID",
+      "required": true
     },
     "CLIENT_SECRET": {
-      "description": "Your Google CLIENT_SECRET. Refer project docs.",
-      "value": ""
+      "description": "Google Client Secret",
+      "required": true
     },
     "BOT_OWNER": {
-      "description": "Telegram id of the bot owner.",
-      "value": ""
+      "description": "Your Telegram User ID",
+      "required": true
     },
     "AUTH_USERS": {
-      "description": "Telegram id of authorised users, separated by comma",
-      "value": "",
-      "required":false
+      "description": "Comma separated user IDs",
+      "required": false
     },
     "VIDEO_DESCRIPTION": {
-      "description": "Any default description to be aded to the video.",
-      "value": "",
-      "required":false
+      "description": "Default video description",
+      "required": false
     },
     "VIDEO_CATEGORY": {
-      "description": "YouTube's video category id.",
-      "value": "",
-      "required":false
+      "description": "YouTube category id",
+      "required": false
     },
     "VIDEO_TITLE_PREFIX": {
-      "description": "Any prefix to be added to the video's title.",
-      "value": "",
-      "required":false
+      "description": "Prefix for title",
+      "required": false
     },
     "VIDEO_TITLE_SUFFIX": {
-      "description": "Any suffix to be added to the video's title.",
-      "value": "",
-      "required":false
+      "description": "Suffix for title",
+      "required": false
     },
     "UPLOAD_MODE": {
-      "description": "The video's privacy status. Valid values for this property are: private, public, unlisted",
+      "description": "private/public/unlisted",
       "value": "private",
-      "required":false
+      "required": false
     },
     "DEBUG": {
-      "description": "Pass any value to set logging to debug level.",
-      "value": "",
-      "required":false
+      "description": "Enable debug logs",
+      "required": false
     }
-   },
-   "buildpacks": [
+  },
+  "formation": {
+    "worker": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "buildpacks": [
     {
       "url": "heroku/python"
     }
   ]
-}
+    }
