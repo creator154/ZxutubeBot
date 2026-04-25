@@ -5,23 +5,25 @@ from pyrogram.types import (
     Message,
     CallbackQuery,
 )
-from pyrogram.enums import ChatAction  # ✅ FIX added
+from pyrogram.enums import ChatAction
 
 from ..youtube import GoogleAuth
 from ..config import Config
 from ..translations import Messages as tr
 from ..utubebot import UtubeBot
 
+# ✅ AUTH URL ek baar generate hoga (FloodWait fix)
+auth = GoogleAuth(Config.CLIENT_ID, Config.CLIENT_SECRET)
+AUTH_URL = auth.GetAuthUrl()
+
 
 def map_btns(pos):
     if pos == 1:
         button = [[InlineKeyboardButton(text="-->", callback_data="help+2")]]
     elif pos == len(tr.HELP_MSG) - 1:
-        auth = GoogleAuth(Config.CLIENT_ID, Config.CLIENT_SECRET)
-        url = auth.GetAuthUrl()
         button = [
             [InlineKeyboardButton(text="<--", callback_data=f"help+{pos-1}")],
-            [InlineKeyboardButton(text="Authentication URL", url=url)],
+            [InlineKeyboardButton(text="Authentication URL", url=AUTH_URL)],
         ]
     else:
         button = [
@@ -40,7 +42,7 @@ def map_btns(pos):
     & Filters.user(Config.AUTH_USERS)
 )
 async def _help(c: UtubeBot, m: Message):
-    await m.reply_chat_action(ChatAction.TYPING)  # ✅ FIXED
+    await m.reply_chat_action(ChatAction.TYPING)
     await m.reply_text(
         text=tr.HELP_MSG[1],
         reply_markup=InlineKeyboardMarkup(map_btns(1)),
