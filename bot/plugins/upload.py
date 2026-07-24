@@ -54,12 +54,7 @@ async def _upload(c: UtubeBot, m: Message):
 
     download = Downloader(m)
 
-    status, file = await download.start(
-        progress,
-        snt,
-        c,
-        download_id
-    )
+    status, file = await download.start(progress, snt, c, download_id)
 
     c.download_controller.pop(download_id, None)
 
@@ -68,19 +63,12 @@ async def _upload(c: UtubeBot, m: Message):
         await snt.edit_text(file)
         return
 
-    await snt.edit_text(
-        "📥 **ᴅᴏᴡɴʟᴏᴀᴅ ᴄᴏᴍᴘʟᴇᴛᴇ**\n\n"
-        "📤 **ᴜᴘʟᴏᴀᴅɪɴɢ ᴛᴏ ʏᴏᴜᴛᴜʙᴇ...**"
-    )
+    await snt.edit_text("📥 **ᴅᴏᴡɴʟᴏᴀᴅ ᴄᴏᴍᴘʟᴇᴛᴇ**\n\n📤 **ᴜᴘʟᴏᴀᴅɪɴɢ ᴛᴏ ʏᴏᴜᴛᴜʙᴇ...**")
 
     title = " ".join(m.command[1:]) or f"Uploaded_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
     upload = Uploader(file, title)
-
-    status, link = await upload.start(
-        progress,
-        snt
-    )
+    status, link = await upload.start(progress, snt)
 
     # file delete
     if os.path.exists(file):
@@ -88,14 +76,10 @@ async def _upload(c: UtubeBot, m: Message):
 
     if not status:
         c.counter -= 1
-        await snt.edit_text(
-            f"❌ **ᴜᴘʟᴏᴀᴅ ғᴀɪʟᴇᴅ**\n\n`{link}`"
-        )
+        await snt.edit_text(f"❌ **ᴜᴘʟᴏᴀᴅ ғᴀɪʟᴇᴅ**\n\n`{link}`")
         return
 
-    # Link ko proper format karna
-    video_id = link.split("/")[-1]
-    youtube_url = f"https://youtu.be/{video_id}"
+    youtube_url = link
 
     await snt.edit_text(
         f"**✅ ᴜᴘʟᴏᴀᴅ ᴄᴏᴍᴘʟᴇᴛᴇ**\n\n"
@@ -113,46 +97,27 @@ async def _upload(c: UtubeBot, m: Message):
 
 def get_download_id(storage: dict) -> str:
     while True:
-        download_id = "".join(
-            random.choice(string.ascii_letters)
-            for _ in range(3)
-        )
+        download_id = "".join(random.choice(string.ascii_letters) for _ in range(3))
         if download_id not in storage:
             return download_id
 
 def valid_media(media: Message) -> bool:
-    if media.video:
-        return True
-    if media.video_note:
-        return True
-    if media.animation:
-        return True
-    if media.document and "video" in media.document.mime_type:
-        return True
+    if media.video: return True
+    if media.video_note: return True
+    if media.animation: return True
+    if media.document and "video" in media.document.mime_type: return True
     return False
 
-def human_bytes(
-    num: Union[int, float],
-    split: bool = False
-):
+def human_bytes(num: Union[int, float], split: bool = False):
     base = 1024.0
     suffix = ["B","KB","MB","GB","TB"]
     for unit in suffix:
         if abs(num) < base:
-            if split:
-                return round(num,2), unit
+            if split: return round(num,2), unit
             return f"{round(num,2)} {unit}"
         num /= base
 
-async def progress(
-    cur,
-    tot,
-    start_time,
-    status,
-    snt,
-    c,
-    download_id
-):
+async def progress(cur, tot, start_time, status, snt, c, download_id):
     if not c.download_controller.get(download_id):
         raise StopTransmission
     try:
@@ -160,28 +125,8 @@ async def progress(
         if diff < 1: diff = 1
         if int(time.time()) % 3 == 0 or cur == tot:
             await asyncio.sleep(0.5)
-            speed, unit = human_bytes(
-                cur / diff,
-                True
-            )
-            text = (
-                f"**{status}**\n\n"
-                f"Progress: {round((cur*100)/tot,2)}%\n"
-                f"{human_bytes(cur)} / {human_bytes(tot)}\n"
-                f"Speed: {speed} {unit}/s"
-            )
-            await snt.edit_text(
-                text,
-                reply_markup=InlineKeyboardMarkup(
-                    [
-                        [
-                            InlineKeyboardButton(
-                                "❌ Cancel",
-                                f"cncl+{download_id}"
-                            )
-                        ]
-                    ]
-                )
-            )
+            speed, unit = human_bytes(cur / diff, True)
+            text = f"**{status}**\n\nProgress: {round((cur*100)/tot,2)}%\n{human_bytes(cur)} / {human_bytes(tot)}\nSpeed: {speed} {unit}/s"
+            await snt.edit_text(text, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("❌ Cancel", f"cncl+{download_id}")]]))
     except Exception:
         pass
