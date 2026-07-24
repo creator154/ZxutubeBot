@@ -21,20 +21,12 @@ class Uploader:
         }
 
     async def start(self, progress: callable = None, *args) -> Tuple[bool, str]:
-        self.progress = progress
-        self.args = args
-        await self._upload()
-        return self.status, self.message
-
-    async def _upload(self) -> None:
         try:
             loop = asyncio.get_running_loop()
             auth = GoogleAuth(Config.CLIENT_ID, Config.CLIENT_SECRET)
 
             if not os.path.isfile(Config.CRED_FILE):
-                self.status = False
-                self.message = "Upload failed because you did not authenticate me."
-                return
+                return False, "Upload failed because you did not authenticate me."
 
             auth.LoadCredentialsFile(Config.CRED_FILE)
             google = await loop.run_in_executor(None, auth.authorize)
@@ -48,21 +40,27 @@ class Uploader:
             privacyStatus = "private" if not Config.UPLOAD_MODE else Config.UPLOAD_MODE
 
             properties = dict(title=title, description=description, category=categoryId, privacyStatus=privacyStatus)
-            log.debug(f"payload for {self.file} : {properties}")
 
             youtube = YouTube(google)
-            video_id = await loop.run_in_executor(None, youtube.upload_video, self.file, properties) # <-- Direct ID aa rahi hai
+            video_id = await loop.run_in_executor(None, youtube.upload_video, self.file, properties, progress, *args)
 
             if not video_id:
-                raise Exception("Video ID not returned from YouTube")
+                return False, "Video ID not returned from YouTube"
 
             video_url = f"https://youtu.be/{video_id}"
-            log.info(f"Upload successful: {video_url}")
 
-            self.status = True
-            self.message = video_url # <-- Sirf URL return
+            # Yahi format chahiye tumhe
+            message = (
+                f"Title: {title}\n"
+                f"Link: {video_url}\n\n"
+                f"Category ID: {categoryName} | Category Code: {categoryId} |\n\n"
+                f"YouTube\n"
+                f"{title}\n"
+                f"Uploaded By ZxutubeBot"
+            )
+
+            return True, message
 
         except Exception as e:
             log.error(e, exc_info=True)
-            self.status = False
-            self.message = f"Error occurred during upload.\nError: {e}"
+            return False, f"Error occurred during upload.\nError: {e}"
