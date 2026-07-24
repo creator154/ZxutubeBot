@@ -1,8 +1,16 @@
-import os, time, string, random, logging, asyncio, datetime
+import os
+import time
+import string
+import random
+import logging
+import asyncio
+import datetime
 from typing import Union
+
 from pyrogram import StopTransmission
 from pyrogram import filters as Filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
+
 from..translations import Messages as tr
 from..helpers.downloader import Downloader
 from..helpers.uploader import Uploader
@@ -13,14 +21,17 @@ log = logging.getLogger(__name__)
 
 @UtubeBot.on_message(Filters.private & Filters.incoming & Filters.command("upload") & Filters.user(Config.AUTH_USERS))
 async def _upload(c: UtubeBot, m: Message):
+
     if not os.path.exists(Config.CRED_FILE): return await m.reply_text(tr.NOT_AUTHENTICATED_MSG)
     if not m.reply_to_message: return await m.reply_text(tr.NOT_A_REPLY_MSG)
+
     message = m.reply_to_message
     if not message.media: return await m.reply_text(tr.NOT_A_MEDIA_MSG)
     if not valid_media(message): return await m.reply_text(tr.NOT_A_VALID_MEDIA_MSG)
 
     snt = await m.reply_text("⏳ **ᴘʀᴏᴄᴇssɪɴɢ...**")
     c.counter += 1
+
     download_id = get_download_id(c.download_controller)
     c.download_controller[download_id] = True
 
@@ -33,19 +44,25 @@ async def _upload(c: UtubeBot, m: Message):
         return await snt.edit_text(file)
 
     await snt.edit_text("📥 **ᴅᴏᴡɴʟᴏᴀᴅ ᴄᴏᴍᴘʟᴇᴛᴇ**\n\n📤 **ᴜᴘʟᴏᴀᴅɪɴɢ ᴛᴏ ʏᴏᴜᴛᴜʙᴇ...**")
+
     title = " ".join(m.command[1:]) or f"Uploaded_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
     upload = Uploader(file, title)
     status, link = await upload.start(progress, snt)
 
     if os.path.exists(file): os.remove(file)
+
     if not status:
         c.counter -= 1
         return await snt.edit_text(f"❌ **ᴜᴘʟᴏᴀᴅ ғᴀɪʟᴇᴅ**\n\n`{link}`")
 
+    # link me se url nikalna hai button ke liye
+    youtube_url = link.split("Link: ")[1].split("\n")[0]
+
     await snt.edit_text(
-        f"**✅ ᴜᴘʟᴏᴀᴅ ᴄᴏᴍᴘʟᴇᴛᴇ**\n\n**Title:** `{title}`\n**Link:** {link}",
-        parse_mode="markdown", disable_web_page_preview=False,
-        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("▶️ Watch on YouTube", url=link)]])
+        f"**✅ ᴜᴘʟᴏᴀᴅ ᴄᴏᴍᴘʟᴇᴛᴇ**\n\n{link}",
+        parse_mode="markdown",
+        disable_web_page_preview=False,
+        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("▶️ Watch on YouTube", url=youtube_url)]])
     )
     c.counter -= 1
 
