@@ -30,9 +30,11 @@ async def start(c: UtubeBot, m: Message):
 
     await m.reply_chat_action(ChatAction.UPLOAD_PHOTO)
 
-    await m.reply_photo(
-        photo=random.choice(tr.IMAGE_LIST),
-        caption=tr.START_MSG.format(m.from_user.first_name),
-        reply_markup=buttons,
-        quote=True,
-    )
+await m.reply_photo(
+    photo=random.choice(tr.IMAGE_LIST),
+    caption=tr.START_MSG.format(m.from_user.first_name),
+    parse_mode="markdown",
+    has_spoiler=True,
+    reply_markup=buttons,
+    quote=True,
+)
