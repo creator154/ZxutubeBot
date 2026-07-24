@@ -28,125 +28,179 @@ log = logging.getLogger(__name__)
     & Filters.user(Config.AUTH_USERS)
 )
 async def _upload(c: UtubeBot, m: Message):
+
     if not os.path.exists(Config.CRED_FILE):
-        await m.reply_text(tr.NOT_AUTHENTICATED_MSG, True)
+        await m.reply_text(tr.NOT_AUTHENTICATED_MSG)
         return
 
     if not m.reply_to_message:
-        await m.reply_text(tr.NOT_A_REPLY_MSG, True)
+        await m.reply_text(tr.NOT_A_REPLY_MSG)
         return
 
     message = m.reply_to_message
 
     if not message.media:
-        await m.reply_text(tr.NOT_A_MEDIA_MSG, True)
+        await m.reply_text(tr.NOT_A_MEDIA_MSG)
         return
 
     if not valid_media(message):
-        await m.reply_text(tr.NOT_A_VALID_MEDIA_MSG, True)
+        await m.reply_text(tr.NOT_A_VALID_MEDIA_MSG)
         return
 
-    if c.counter >= 6:
-        await m.reply_text(tr.DAILY_QOUTA_REACHED, True)
 
-    snt = await m.reply_text(tr.PROCESSING, True)
+    snt = await m.reply_text("⏳ **ᴘʀᴏᴄᴇssɪɴɢ...**")
+
     c.counter += 1
+
     download_id = get_download_id(c.download_controller)
     c.download_controller[download_id] = True
 
+
     download = Downloader(m)
-    status, file = await download.start(progress, snt, c, download_id)
-    log.debug(status, file)
-    c.download_controller.pop(download_id)
+
+    status, file = await download.start(
+        progress,
+        snt,
+        c,
+        download_id
+    )
+
+
+    c.download_controller.pop(download_id, None)
+
 
     if not status:
         c.counter -= 1
-        c.counter = max(0, c.counter)
-        await snt.edit_text(text=file, parse_mode="markdown")
+        await snt.edit_text(file)
         return
 
-    try:
-        await snt.edit_text("Downloaded to local, Now starting to upload to youtube...")
-    except Exception as e:
-        log.warning(e, exc_info=True)
-        pass
+
+    await snt.edit_text(
+        "📥 **ᴅᴏᴡɴʟᴏᴀᴅ ᴄᴏᴍᴘʟᴇᴛᴇ**\n\n"
+        "📤 **ᴜᴘʟᴏᴀᴅɪɴɢ ᴛᴏ ʏᴏᴜᴛᴜʙᴇ...**"
+    )
+
 
     title = " ".join(m.command[1:])
+
+
     upload = Uploader(file, title)
-    status, link = await upload.start(progress, snt)
-    log.debug(status, link)
+
+    status, link = await upload.start(
+        progress,
+        snt
+    )
+
+
     if not status:
         c.counter -= 1
-        c.counter = max(0, c.counter)
-    await snt.edit_text(text=link, parse_mode="markdown")
+        await snt.edit_text(
+            f"❌ **ᴜᴘʟᴏᴀᴅ ғᴀɪʟᴇᴅ**\n\n{link}"
+        )
+        return
+
+
+    await snt.edit_text(
+        f"**✅ ᴜᴘʟᴏᴀᴅ ᴄᴏᴍᴘʟᴇᴛᴇ**\n\n"
+        f"{link}",
+        parse_mode="markdown"
+    )
 
 
 def get_download_id(storage: dict) -> str:
     while True:
-        download_id = "".join([random.choice(string.ascii_letters) for i in range(3)])
+        download_id = "".join(
+            random.choice(string.ascii_letters)
+            for _ in range(3)
+        )
         if download_id not in storage:
-            break
-    return download_id
+            return download_id
 
 
 def valid_media(media: Message) -> bool:
+
     if media.video:
         return True
-    elif media.video_note:
+
+    if media.video_note:
         return True
-    elif media.animation:
+
+    if media.animation:
         return True
-    elif media.document and "video" in media.document.mime_type:
+
+    if media.document and "video" in media.document.mime_type:
         return True
-    else:
-        return False
+
+    return False
+
 
 
 def human_bytes(
-    num: Union[int, float], split: bool = False
-) -> Union[str, Tuple[int, str]]:
+    num: Union[int, float],
+    split: bool = False
+):
+
     base = 1024.0
-    sufix_list = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
-    for unit in sufix_list:
+    suffix = [
+        "B","KB","MB","GB","TB"
+    ]
+
+    for unit in suffix:
         if abs(num) < base:
             if split:
-                return round(num, 2), unit
-            return f"{round(num, 2)} {unit}"
+                return round(num,2), unit
+            return f"{round(num,2)} {unit}"
         num /= base
 
 
+
 async def progress(
-    cur: Union[int, float],
-    tot: Union[int, float],
-    start_time: float,
-    status: str,
-    snt: Message,
-    c: UtubeBot,
-    download_id: str,
+    cur,
+    tot,
+    start_time,
+    status,
+    snt,
+    c,
+    download_id
 ):
+
     if not c.download_controller.get(download_id):
         raise StopTransmission
 
     try:
+
         diff = int(time.time() - start_time)
 
-        if (int(time.time()) % 5 == 0) or (cur == tot):
+        if int(time.time()) % 5 == 0 or cur == tot:
+
             await asyncio.sleep(1)
-            speed, unit = human_bytes(cur / diff, True)
-            curr = human_bytes(cur)
-            tott = human_bytes(tot)
-            eta = datetime.timedelta(seconds=int(((tot - cur) / (1024 * 1024)) / speed))
-            elapsed = datetime.timedelta(seconds=diff)
-            progress = round((cur * 100) / tot, 2)
-            text = f"{status}\n\n{progress}% done.\n{curr} of {tott}\nSpeed: {speed} {unit}PS"
-            f"\nETA: {eta}\nElapsed: {elapsed}"
-            await snt.edit_text(
-                text=text,
-                reply_markup=InlineKeyboardMarkup(
-                    [[InlineKeyboardButton("Cancel!", f"cncl+{download_id}")]]
-                ),
+
+            speed, unit = human_bytes(
+                cur / diff,
+                True
             )
 
-    except Exception as e:
-        log.info(e)
+            text = (
+                f"**{status}**\n\n"
+                f"Progress: {round((cur*100)/tot,2)}%\n"
+                f"{human_bytes(cur)} / {human_bytes(tot)}\n"
+                f"Speed: {speed} {unit}/s"
+            )
+
+
+            await snt.edit_text(
+                text,
+                reply_markup=InlineKeyboardMarkup(
+                    [
+                        [
+                            InlineKeyboardButton(
+                                "❌ Cancel",
+                                f"cncl+{download_id}"
+                            )
+                        ]
+                    ]
+                )
+            )
+
+    except Exception:
         pass
