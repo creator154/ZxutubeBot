@@ -1,37 +1,25 @@
 import random
 
-from pyrogram import filters as Filters
-from pyrogram.types import (
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
-    Message
-)
+from pyrogram import filters
+from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
 from ..translations import Messages as tr
-from ..auth_store import auth_filter, add_broadcast_user
 from ..utubebot import UtubeBot
 
 
-@UtubeBot.on_message(
-    Filters.private
-    & Filters.incoming
-    & Filters.command("start")
-    & auth_filter
-)
-async def _start(c: UtubeBot, m: Message):
-    add_broadcast_user(m.from_user.id)
-
-    await m.reply_chat_action("typing")
-
+@UtubeBot.on_message(filters.private & filters.command("start"))
+async def start(_, m: Message):
     caption = f"""
-<b>Hi there {m.from_user.mention} 🇮🇳.</b>
+<b>Hi there {m.from_user.mention} 👋</b>
 
-I'm <b>YouTube Uploader Bot</b>. Made with ❤️ by @SumitTripathi.
+🎬 <b>Welcome to YouTube Uploader Bot</b>
 
-You can use me to upload any Telegram video to YouTube once you authorise me.
+This bot can upload your Telegram videos directly to YouTube.
 
-📖 You can know more from /help.
-🔐 Or use /login to get started.
+📌 Commands:
+/login - Login with Google
+/help - Help
+/cancel - Cancel current task
 """
 
     buttons = InlineKeyboardMarkup(
@@ -42,8 +30,8 @@ You can use me to upload any Telegram video to YouTube once you authorise me.
             ],
             [
                 InlineKeyboardButton(
-                    "👨‍💻 Developer",
-                    url="https://t.me/HeySumit"
+                    "🌐 Source",
+                    url="https://github.com/creator154/ZxutubeBot"
                 )
             ]
         ]
@@ -52,6 +40,5 @@ You can use me to upload any Telegram video to YouTube once you authorise me.
     await m.reply_photo(
         photo=random.choice(tr.IMAGE_LIST),
         caption=caption,
-        reply_markup=buttons,
-        quote=True
+        reply_markup=buttons
     )
