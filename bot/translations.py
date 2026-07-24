@@ -5,37 +5,38 @@ class Messages:
     ]
 
     START_MSG = (
-        "**Hi there {} 🇮🇳.**\n\n"
-
-        "**I'm YouTube Uploader Bot. Made with ❤️ by @SumitTripathi.** "
+        "<b>Hi there {} 🇮🇳.</b>\n\n"
+        "<b>I'm YouTube Uploader Bot. Made with ❤️ by @SumitTripathi.</b>\n\n"
         "You can use me to upload any Telegram video to YouTube once you authorise me.\n\n"
-
-        "**You can know more from** /help.\n"
-        "**Or use** /login **to get started.**"
+        "<b>You can know more from</b> /help.\n"
+        "<b>Or use</b> /login <b>to get started.</b>"
     )
 
     HELP_MSG = [
         ".",
-        "Hi there.\n\nFirst things first. You should be aware that YouTube processes every uploaded video. Copyrighted videos may be blocked or removed.",
 
-        "**Let's learn how I work.**\n\n"
-        "**Step 1:** Authorise me using Google.\n"
-        "**Step 2:** Forward any Telegram video.\n"
-        "**Step 3:** Reply `/upload` to the video.\n"
-        "**Step 4:** I upload it to YouTube.\n"
-        "**Step 5:** I send you the YouTube link.",
+        "Hi there.\n\n"
+        "First things first. You should be aware that YouTube processes every uploaded video. "
+        "Copyrighted videos may be blocked or removed.",
 
-        "**Create a YouTube Channel**\n\n"
+        "<b>Let's learn how I work.</b>\n\n"
+        "<b>Step 1:</b> Authorise me using Google.\n"
+        "<b>Step 2:</b> Forward any Telegram video.\n"
+        "<b>Step 3:</b> Reply <code>/upload</code> to the video.\n"
+        "<b>Step 4:</b> I upload it to YouTube.\n"
+        "<b>Step 5:</b> I send you the YouTube link.",
+
+        "<b>Create a YouTube Channel</b>\n\n"
         "If you don't have a channel, create one before using me.",
 
-        "**Verify your YouTube Account**\n\n"
+        "<b>Verify your YouTube Account</b>\n\n"
         "Verification allows uploading videos longer than 15 minutes.",
 
-        "**Now let's Authorise.**\n\n"
-        "Click the Authentication URL button below.\n"
-        "Allow access and copy the code.\n"
-        "Then send:\n\n"
-        "`/authorise YOUR_CODE`"
+        "<b>Now let's Authorise.</b>\n\n"
+        "Click the Authentication URL button.\n"
+        "Allow access and copy the code.\n\n"
+        "Then send:\n"
+        "<code>/authorise YOUR_CODE</code>"
     ]
 
     NOT_A_REPLY_MSG = "Please reply to a video."
@@ -48,4 +49,20 @@ class Messages:
         "Looks like you've reached YouTube's daily upload limit."
     )
 
-    PROCESSING = "
+    PROCESSING = "⏳ Processing..."
+
+    NOT_AUTHENTICATED_MSG = (
+        "❌ You are not authenticated.\nUse /login or /help."
+    )
+
+    NO_AUTH_CODE_MSG = "Please provide the authentication code."
+
+    AUTH_SUCCESS_MSG = (
+        "✅ Successfully authenticated!\n\nHappy Uploading 🎉"
+    )
+
+    AUTH_FAILED_MSG = "❌ Authentication Failed.\n\nDetails:\n{}"
+
+    AUTH_DATA_SAVE_SUCCESS = (
+        "✅ Authentication data saved successfully."
+    )
