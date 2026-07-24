@@ -58,8 +58,8 @@ async def _upload(c: UtubeBot, m: Message):
     # link me se url nikalna hai button ke liye
     youtube_url = link.split("Link: ")[1].split("\n")[0]
 
-    await snt.edit_text(
-        f"**✅ ᴜᴘʟᴏᴀᴅ ᴄᴏᴍᴘʟᴇᴛᴇ**\n\n{link}",
+    await snt.edit_text(text=link,
+        f"✅ ᴜᴘʟᴏᴀᴅ ᴄᴏᴍᴘʟᴇᴛᴇ\n\n{link}",
         parse_mode="markdown",
         disable_web_page_preview=False,
         reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("▶️ Watch on YouTube", url=youtube_url)]])
