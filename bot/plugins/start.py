@@ -1,6 +1,7 @@
 import random
 
 from pyrogram import filters as Filters
+from pyrogram.enums import ParseMode
 from pyrogram.types import Message
 
 from ..translations import Messages as tr
@@ -19,7 +20,7 @@ async def start(c: UtubeBot, m: Message):
     await m.reply_photo(
         photo=random.choice(tr.IMAGE_LIST),
         caption=tr.START_MSG.format(m.from_user.first_name),
+        parse_mode=ParseMode.HTML,
         has_spoiler=True,
-        parse_mode="markdown",
         quote=True,
     )
