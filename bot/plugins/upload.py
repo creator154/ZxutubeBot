@@ -5,7 +5,7 @@ import random
 import logging
 import asyncio
 import datetime
-from typing import Tuple, Union
+from typing import Union
 
 from pyrogram import StopTransmission
 from pyrogram import filters as Filters
@@ -24,6 +24,7 @@ log = logging.getLogger(__name__)
     & Filters.incoming
     & Filters.command("upload")
     & Filters.user(Config.AUTH_USERS)
+)
 async def _upload(c: UtubeBot, m: Message):
 
     if not os.path.exists(Config.CRED_FILE):
@@ -92,7 +93,7 @@ async def _upload(c: UtubeBot, m: Message):
         )
         return
 
-    # Yahi naya part hai
+    # Link ko proper format karna
     video_id = link.split("/")[-1]
     youtube_url = f"https://youtu.be/{video_id}"
 
@@ -156,9 +157,9 @@ async def progress(
         raise StopTransmission
     try:
         diff = time.time() - start_time
-        if diff == 0: diff = 1
-        if int(time.time()) % 5 == 0 or cur == tot:
-            await asyncio.sleep(1)
+        if diff < 1: diff = 1
+        if int(time.time()) % 3 == 0 or cur == tot:
+            await asyncio.sleep(0.5)
             speed, unit = human_bytes(
                 cur / diff,
                 True
