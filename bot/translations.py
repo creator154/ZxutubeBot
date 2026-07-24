@@ -5,54 +5,71 @@ class Messages:
     ]
 
     START_MSG = (
-        "👋 **Hi there {} 🇮🇳**\n\n"
+        "<b>👋 Hi there {} 🇮🇳</b>\n\n"
 
-        "**I'm YouTube Uploader Bot.** ❤️\n\n"
+        "<b>🎬 I'm YouTube Uploader Bot</b>\n\n"
 
-        "**Made with ❤️ by @SumitTripathi.**\n\n"
+        "<b>✨ Features</b>\n"
+        "• Upload Telegram videos to YouTube\n"
+        "• Fast & Easy Uploads\n"
+        "• Google Authentication Support\n\n"
 
-        "📤 **I can upload your Telegram videos directly to YouTube after authentication.**\n\n"
+        "<b>📌 Commands</b>\n"
+        "/login - Login with Google\n"
+        "/help - Help Menu\n"
+        "/upload - Upload replied video\n\n"
 
-        "**✨ Available Commands:**\n"
-        "• **/login** - Login with Google Account\n"
-        "• **/help** - Help & User Guide\n"
-        "• **/upload** - Upload a replied video\n"
-        "• **/cancel** - Cancel current upload\n\n"
-
-        "**🚀 Get started by using /login.**"
+        "<b>🚀 Enjoy Uploading!</b>"
     )
 
     HELP_MSG = [
         ".",
-        "Hi there.\n\nFirst things first. You should be aware that YouTube processes every uploaded video and may detect copyrighted content automatically.",
-        "**Step 1:** Authenticate the bot.\n\n**Step 2:** Forward a Telegram video.\n\n**Step 3:** Reply `/upload` to the video.\n\n**Step 4:** Wait for upload.\n\n**Step 5:** Receive the YouTube link.",
-        "**Create a YouTube Channel**\n\nCreate a YouTube channel before using this bot.",
-        "**Verify your YouTube Account**\n\nVerify your account to upload videos longer than 15 minutes.",
-        "**Authentication**\n\nOpen the authentication URL and send:\n\n`/authorise your_code`",
+
+        "Welcome!\n\nThis bot uploads Telegram videos directly to YouTube.",
+
+        "<b>Step 1</b>\nAuthenticate using Google.\n\n"
+        "<b>Step 2</b>\nForward a video.\n\n"
+        "<b>Step 3</b>\nReply with /upload.\n\n"
+        "<b>Step 4</b>\nWait for upload.\n\n"
+        "<b>Step 5</b>\nReceive the YouTube link.",
+
+        "<b>Create a YouTube Channel</b>\n\n"
+        "Create a channel if you don't already have one.",
+
+        "<b>Verify your YouTube Account</b>\n\n"
+        "Verification allows uploads longer than 15 minutes.",
+
+        "<b>Authentication</b>\n\n"
+        "Open the authentication page and send:\n\n"
+        "<code>/authorise YOUR_CODE</code>"
     ]
 
     NOT_A_REPLY_MSG = "Please reply to a video."
+
     NOT_A_MEDIA_MSG = "No media found. Please reply to a video."
+
     NOT_A_VALID_MEDIA_MSG = "Invalid media."
 
     DAILY_QOUTA_REACHED = (
-        "You have reached today's YouTube upload limit."
+        "You have reached YouTube's daily upload limit."
     )
 
-    PROCESSING = "⏳ **Processing... Please wait.**"
+    PROCESSING = "⏳ <b>Processing...</b>"
 
     NOT_AUTHENTICATED_MSG = (
-        "❌ You are not authenticated.\nUse **/login** first."
+        "❌ <b>You are not authenticated.</b>\nUse /login first."
     )
 
     NO_AUTH_CODE_MSG = "Please provide the authentication code."
 
     AUTH_SUCCESS_MSG = (
-        "✅ Authentication successful!\nYou can now upload videos."
+        "✅ <b>Authentication Successful!</b>\n\nHappy Uploading 🎉"
     )
 
-    AUTH_FAILED_MSG = "❌ Authentication failed.\n\n{}"
+    AUTH_FAILED_MSG = (
+        "❌ <b>Authentication Failed!</b>\n\n{}"
+    )
 
     AUTH_DATA_SAVE_SUCCESS = (
-        "✅ Authentication data saved successfully."
+        "✅ <b>Authentication data saved successfully.</b>"
     )
