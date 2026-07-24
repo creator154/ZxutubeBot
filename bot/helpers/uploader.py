@@ -4,12 +4,10 @@ import asyncio
 import logging
 from typing import Optional, Tuple
 
-from ..youtube import GoogleAuth, YouTube
-from ..config import Config
-
+from..youtube import GoogleAuth, YouTube
+from..config import Config
 
 log = logging.getLogger(__name__)
-
 
 class Uploader:
     def __init__(self, file: str, title: Optional[str] = None):
@@ -55,6 +53,7 @@ class Uploader:
 
             auth.LoadCredentialsFile(Config.CRED_FILE)
             google = await loop.run_in_executor(None, auth.authorize)
+
             if Config.VIDEO_CATEGORY and Config.VIDEO_CATEGORY in self.video_category:
                 categoryId = Config.VIDEO_CATEGORY
             else:
@@ -64,12 +63,11 @@ class Uploader:
             title = self.title if self.title else os.path.basename(self.file)
             title = (
                 (Config.VIDEO_TITLE_PREFIX + title + Config.VIDEO_TITLE_SUFFIX)
-                .replace("<", "")
-                .replace(">", "")[:100]
+               .replace("<", "")
+               .replace(">", "")[:100]
             )
-            description = (
-                Config.VIDEO_DESCRIPTION
-            )[:5000]
+            description = (Config.VIDEO_DESCRIPTION)[:5000]
+
             if not Config.UPLOAD_MODE:
                 privacyStatus = "private"
             else:
@@ -92,12 +90,12 @@ class Uploader:
             log.debug(r)
 
             video_id = r["id"]
+            video_url = f"https://youtu.be/{video_id}" # <-- Sirf URL return karenge
+
             self.status = True
-            self.message = (
-                f"Title: {title}\n Link: https://youtu.be/{video_id}"
-                f"\n\nCategory ID: {categoryName} | Category Code: {categoryId} |"
-            )
+            self.message = video_url # <-- Yahi change hai
+
         except Exception as e:
             log.error(e, exc_info=True)
             self.status = False
-            self.message = f"Error occuered during upload.\nError details: {e}"
+            self.message = f"Error occurred during upload.\nError details: {e}"
