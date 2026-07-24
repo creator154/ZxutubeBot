@@ -1,9 +1,11 @@
+import random
+
 from pyrogram import filters as Filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
-from pyrogram.enums import ChatAction  # ✅ add this
 
 from ..translations import Messages as tr
 from ..config import Config
+from ..auth_store import auth_filter, add_broadcast_user
 from ..utubebot import UtubeBot
 
 
@@ -11,15 +13,14 @@ from ..utubebot import UtubeBot
     Filters.private
     & Filters.incoming
     & Filters.command("start")
-    & Filters.user(Config.AUTH_USERS)
+    & auth_filter
 )
 async def _start(c: UtubeBot, m: Message):
-    await m.reply_chat_action(ChatAction.TYPING)  # ✅ fixed
+    add_broadcast_user(m.from_user.id)
 
-    await m.reply_text(
-        text=tr.START_MSG.format(m.from_user.first_name),
+    await m.reply_chat_action("typing")
+    await m.reply_photo(
+        photo=random.choice(tr.IMAGE_LIST),
+        caption=tr.START_MSG.format(m.from_user.first_name),
         quote=True,
-        reply_markup=InlineKeyboardMarkup(
-            [[InlineKeyboardButton("Join Project Channel!", url="https://t.me/Hey_Sumit")]]
-        ),
     )
