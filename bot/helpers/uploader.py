@@ -42,15 +42,16 @@ class Uploader:
             properties = dict(title=title, description=description, category=categoryId, privacyStatus=privacyStatus)
 
             youtube = YouTube(google)
-            video_id = await loop.run_in_executor(None, youtube.upload_video, self.file, properties, progress, *args)
+            ms = await loop.run_in_executor(None, youtube.upload_video, self.file, properties, progress)
 
-            if not video_id:
-                return False, "Video ID not returned from YouTube"
+            if not ms:
+                return False, "Video ID not returned from YouTube!"
 
-            video_url = f"https://youtu.be/{video_id}"
+        # Yahi format chahiye tumhe Bro
 
-            # Yahi format chahiye tumhe
-            message = (
+            video_id = ms["id"]
+            self.status = True
+            self.message = (
                 f"Title: {title}\n"
                 f"Link: https://youtu.be/{video_id}\n\n"
                 f"Category ID: {categoryName} | Category Code: {categoryId} |\n\n"
