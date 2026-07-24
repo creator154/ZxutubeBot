@@ -52,7 +52,7 @@ class Uploader:
             # Yahi format chahiye tumhe
             message = (
                 f"Title: {title}\n"
-                f"Link: {video_url}\n\n"
+                f"Link: {https://youtu.be/{video_id}\n\n"
                 f"Category ID: {categoryName} | Category Code: {categoryId} |\n\n"
                 f"YouTube\n"
                 f"{title}\n"
