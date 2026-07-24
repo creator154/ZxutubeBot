@@ -1,6 +1,7 @@
 import random
 
 from pyrogram import filters as Filters
+from pyrogram.enums import ChatAction
 from pyrogram.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
@@ -27,7 +28,7 @@ async def start(c: UtubeBot, m: Message):
         ]
     )
 
-    await m.reply_chat_action("upload_photo")
+    await m.reply_chat_action(ChatAction.UPLOAD_PHOTO)
 
     await m.reply_photo(
         photo=random.choice(tr.IMAGE_LIST),
